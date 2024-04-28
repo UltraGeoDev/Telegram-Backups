@@ -10,8 +10,10 @@ class Program {
     private readonly string? LastName = ConfigurationManager.AppSettings.Get("last_name");
     private readonly string? Password = ConfigurationManager.AppSettings.Get("password");
     
-    public string? Configs(string what) {
-        switch (what) {
+    public string? Configs(string what) 
+    {
+        switch (what) 
+        {
             case "api_id": return AppId;
             case "api_hash": return AppHash;
             case "phone_number": return PhoneNumber;
@@ -23,7 +25,8 @@ class Program {
         }
     }
 
-    public async Task RunBackup(string[] args) {
+    public async Task RunBackup(string[] args) 
+    {
         // Create telegram client and connect
         using var client = new Client(Configs);
 
@@ -35,7 +38,8 @@ class Program {
 
     }
 
-    static async Task Main(string[] args) {
+    static async Task Main(string[] args) 
+    {
         // Start program
         var program = new Program();
         await program.RunBackup(args);
