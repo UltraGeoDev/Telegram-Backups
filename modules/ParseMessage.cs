@@ -4,11 +4,9 @@ namespace ParsingTools {
     class ParseMessage {
         public string? Parse(MessageBase msgBase) {
             if (msgBase is Message msg) {
-                // TODO: Parse every type of message
                 return ParseDefault(msg);
             }
             else if (msgBase is MessageService ms) {
-                // TODO: Implement service parsing
                 return ParseService(ms);
             }
             return null;
@@ -16,10 +14,12 @@ namespace ParsingTools {
         }
 
         public string ParseDefault(Message msg) {
+            // TODO: Parse every type of message
             return "";
         }
 
         public string ParseService(MessageService msg) {
+            // TODO: Implement service parsing
             return "";
         }
     }
