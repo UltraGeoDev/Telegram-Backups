@@ -1,6 +1,9 @@
 # It's empty for now...
 
-## Version 0.0.1
+## Version 0.0.2
+
+> [!WARNING]
+> not ready for use
 
 Planned to add:
 1. Pulling all types of messages

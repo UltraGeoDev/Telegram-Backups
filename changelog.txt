@@ -2,3 +2,9 @@
 
 - Added initial files.
 - Telegram API connection configured
+
+0.0.2
+
+- files are saved in json
+- basic functionality implemented
+- the simplest processing of all messages
