@@ -1,5 +1,6 @@
 using TL;
 using TelegramData;
+using ParsingTools;
 
 using System.Text.Json;
 
@@ -29,10 +30,12 @@ namespace Backups {
             InputPeerUser peer = new(required_chat.id, user.access_hash);
 
             var messages = await client.Messages_GetHistory(peer);
+            var parsing = new ParseMessage(messages);
 
             foreach (var msgBase in messages.Messages) {
                 // TODO: Parse message
-                
+                Dictionary<string, string?> result = parsing.Parse(msgBase);
+
             }
         }
         
