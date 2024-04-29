@@ -1,8 +1,7 @@
 using TL;
 using TelegramData;
 using ParsingTools;
-
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Backups {
 
@@ -19,12 +18,12 @@ namespace Backups {
             string jsonString = File.ReadAllText(filename);
 
             // Parse chats
-            Chats chats = JsonSerializer.Deserialize<Chats>(jsonString)!;
+            Chats chats = System.Text.Json.JsonSerializer.Deserialize<Chats>(jsonString)!;
             
             return chats; 
         }
 
-        public async Task Get_messages(TelegramData.Chat required_chat) 
+        public async Task<List<Dictionary<string, string?>>> Get_messages(TelegramData.Chat required_chat) 
         {
             User user = new();
             InputPeerUser peer = new(required_chat.id, user.access_hash);
@@ -32,27 +31,37 @@ namespace Backups {
             var messages = await client.Messages_GetHistory(peer);
             var parsing = new ParseMessage(messages);
 
+            List<Dictionary<string, string?>> result = new(); // TODO: <Dictionary<string, string?>>
+
             foreach (var msgBase in messages.Messages) {
                 // TODO: Parse message
-                Dictionary<string, string?> result = parsing.Parse(msgBase);
-
+                Dictionary<string, string?> parsed_msg = parsing.Parse(msgBase);
+                
+                result.Insert(0, parsed_msg);
             }
+            return result;
         }
         
         public async Task Create() 
         {
 
             // Login
-            User user = await client.LoginUserIfNeeded();
+            await client.LoginUserIfNeeded();
 
             // Get chats to backup
             Chats chats = Get_chats();
 
             foreach (var chat in chats.chats) 
             {
-                await Get_messages(chat);
+                // Get messages
+                var messages = await Get_messages(chat);
 
-                // TODO: Save messages
+                // Serialize to string
+                string parsed_string = JsonConvert.SerializeObject(messages, Formatting.Indented);
+
+                // Write to json file
+                string path = $"data/backup/{chat.name}.json";
+                File.WriteAllText(path, parsed_string);
             }
         }
     }

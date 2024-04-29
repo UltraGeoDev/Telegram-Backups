@@ -18,14 +18,14 @@ namespace ParsingTools {
         public Dictionary<string, string?> ParseDefault(Message msg) {
             var from_user = messages.UserOrChat(msg.From ?? msg.Peer);
 
-            var result = new Dictionary<string, string?> () {
+            var parsed = new Dictionary<string, string?> {
                 {"from", from_user.ToString()},
                 {"date", msg.Date.ToString()},
                 {"text", msg.message},
-                {"media", msg.media.ToString()}
+                {"media", $"{msg.media?.GetType().Name}"}
             };
 
-            return result;
+            return parsed;
         }
 
         public Dictionary<string, string?> ParseService(MessageService msg) {
