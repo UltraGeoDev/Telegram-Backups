@@ -21,14 +21,14 @@ namespace ParsingTools {
 
         // Parse default messages
         public async Task<Dictionary<string, string?>> ParseDefault(Message msg) {
-            var from_user = messages.UserOrChat(msg.From ?? msg.Peer);
 
+            var from_user = messages.UserOrChat(msg.From ?? msg.Peer);
             string? media_path = await ParseMedia(msg);
 
             var parsed = new Dictionary<string, string?> {
                 {"from", from_user.ToString()},
                 {"date", msg.Date.ToString()},
-                {"text", msg.message},
+                {"text", msg.message == "" ? null : msg.message},
                 {"media", media_path}
             };
 

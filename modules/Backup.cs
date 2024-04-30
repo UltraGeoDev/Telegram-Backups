@@ -3,6 +3,7 @@ using TelegramData;
 using ParsingTools;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
+using TL.Methods;
 
 namespace Backups {
 
@@ -31,21 +32,48 @@ namespace Backups {
             User user = new();
             InputPeerUser peer = new(required_chat.id, user.access_hash);
 
-            var messages = await client.Messages_GetHistory(peer, limit: limit);
-            var parsing = new ParseMessage(messages, client);
-
+            // Parsed messages
             List<Dictionary<string, string?>> result = [];
 
-            foreach (var msgBase in messages.Messages) {
-                Dictionary<string, string?> parsed_msg = await parsing.Parse(msgBase);
-                
-                result.Insert(0, parsed_msg);
+            // Takeout session
+            var takeout = await client.Account_InitTakeoutSession(
+                message_chats: true,
+                message_channels: true,
+                message_users: true
+            );
+
+            var finishTakeout = new Account_FinishTakeoutSession();
+
+
+            // Get messages
+            var messages = await client.InvokeWithTakeout(
+                takeout.id, 
+                new Messages_GetHistory() {peer=peer, limit=limit}
+            );
+
+            // Pasing tools
+            var parsing = new ParseMessage(messages, client);
+
+            // Parse messages
+            try {
+                foreach (var msgBase in messages.Messages) {
+                    var parsed_msg = await parsing.Parse(msgBase); // Parse message
+                    result.Insert(0, parsed_msg); // Insert at the beginning
+                }
+                finishTakeout.flags = Account_FinishTakeoutSession.Flags.success;
             }
+            finally {
+                await client.InvokeWithTakeout(takeout.id, finishTakeout); // Finish takeout
+            }
+
             return result;
         }
         
         public async Task Create() 
         {
+            // Create folders
+            Directory.CreateDirectory("data/backup");
+            Directory.CreateDirectory("data/media");
 
             // Login
             await client.LoginUserIfNeeded();

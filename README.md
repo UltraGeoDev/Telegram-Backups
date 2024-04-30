@@ -1,6 +1,6 @@
 # It's empty for now...
 
-## Version 0.0.3
+## Version 0.0.4
 
 > [!WARNING]
 > not ready for use

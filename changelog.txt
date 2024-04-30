@@ -13,3 +13,7 @@
 
 - added logging
 - added file downloading
+
+0.0.4
+
+- added takeout session

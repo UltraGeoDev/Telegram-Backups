@@ -2,6 +2,8 @@
 using Backups;
 using WTelegram;
 using Microsoft.Extensions.Logging;
+using TL;
+using TL.Methods;
 
 class Program {
     private readonly string? AppId = ConfigurationManager.AppSettings.Get("api_id");
@@ -42,7 +44,6 @@ class Program {
         // Create backup
         logger.LogInformation("Starting backup...");
         await backup.Create();
-
     }
 
     static async Task Main(string[] args) 
