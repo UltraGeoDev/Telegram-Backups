@@ -1,6 +1,6 @@
 # It's empty for now...
 
-## Version 0.0.2
+## Version 0.0.3
 
 > [!WARNING]
 > not ready for use
@@ -12,3 +12,5 @@ Planned to add:
 4. Statistics collection
 
 Startup instructions will come later :(
+
+created by [UltraGeoPro](https://github.com/Ultrageopro1966)

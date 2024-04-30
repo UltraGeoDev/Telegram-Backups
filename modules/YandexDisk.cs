@@ -1,3 +1,4 @@
-namespace YaDisk {
+namespace YaDisk 
+{
     // TODO: YandexDisk.cs
 }

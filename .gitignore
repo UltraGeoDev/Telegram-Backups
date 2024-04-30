@@ -2,6 +2,7 @@
 App.config
 data/chats.json
 data/backup/*.json
+
 *.swp
 *.*~
 project.lock.json

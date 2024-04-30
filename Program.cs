@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using Backups;
 using WTelegram;
+using Microsoft.Extensions.Logging;
 
 class Program {
     private readonly string? AppId = ConfigurationManager.AppSettings.Get("api_id");
@@ -9,6 +10,7 @@ class Program {
     private readonly string? FirstName = ConfigurationManager.AppSettings.Get("first_name");
     private readonly string? LastName = ConfigurationManager.AppSettings.Get("last_name");
     private readonly string? Password = ConfigurationManager.AppSettings.Get("password");
+    private readonly int limit = int.Parse(ConfigurationManager.AppSettings.Get("limit")!);
     
     public string? Configs(string what) 
     {
@@ -27,13 +29,18 @@ class Program {
 
     public async Task RunBackup(string[] args) 
     {
+        // Create logger
+        using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
+        ILogger logger = factory.CreateLogger("Program");
+
         // Create telegram client and connect
         using var client = new Client(Configs);
 
         // Create backup instance
-        var backup = new CreateBackup(client);
-
+        var backup = new CreateBackup(client, logger, limit);
+        
         // Create backup
+        logger.LogInformation("Starting backup...");
         await backup.Create();
 
     }

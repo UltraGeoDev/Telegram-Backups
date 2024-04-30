@@ -8,3 +8,8 @@
 - files are saved in json
 - basic functionality implemented
 - the simplest processing of all messages
+
+0.0.3
+
+- added logging
+- added file downloading

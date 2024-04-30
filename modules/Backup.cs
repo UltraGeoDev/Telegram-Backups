@@ -2,13 +2,16 @@ using TL;
 using TelegramData;
 using ParsingTools;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Backups {
 
-    class CreateBackup (WTelegram.Client client) 
+    class CreateBackup (WTelegram.Client client, ILogger logger, int limit = 100) 
     {
 
         public WTelegram.Client client = client;
+        public int limit = limit;
+        public ILogger logger = logger;
 
         public static Chats Get_chats() 
         {
@@ -16,7 +19,7 @@ namespace Backups {
             // Get chats
             string filename = "data/chats.json";
             string jsonString = File.ReadAllText(filename);
-
+            
             // Parse chats
             Chats chats = System.Text.Json.JsonSerializer.Deserialize<Chats>(jsonString)!;
             
@@ -28,14 +31,13 @@ namespace Backups {
             User user = new();
             InputPeerUser peer = new(required_chat.id, user.access_hash);
 
-            var messages = await client.Messages_GetHistory(peer);
-            var parsing = new ParseMessage(messages);
+            var messages = await client.Messages_GetHistory(peer, limit: limit);
+            var parsing = new ParseMessage(messages, client);
 
-            List<Dictionary<string, string?>> result = new(); // TODO: <Dictionary<string, string?>>
+            List<Dictionary<string, string?>> result = [];
 
             foreach (var msgBase in messages.Messages) {
-                // TODO: Parse message
-                Dictionary<string, string?> parsed_msg = parsing.Parse(msgBase);
+                Dictionary<string, string?> parsed_msg = await parsing.Parse(msgBase);
                 
                 result.Insert(0, parsed_msg);
             }
@@ -62,6 +64,8 @@ namespace Backups {
                 // Write to json file
                 string path = $"data/backup/{chat.name}.json";
                 File.WriteAllText(path, parsed_string);
+
+                logger.LogInformation($"Created backup for {chat.name}. Total messages: {messages.Count}");
             }
         }
     }
