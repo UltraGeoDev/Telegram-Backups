@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram Backups", "Telegram Backups.csproj", "{1B1AEA92-C3FE-4B08-8118-2A63909CBA9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram Backups", "Telegram Backups.csproj", "{1F770A9A-D2CA-40B3-BC5D-8696120B4606}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1B1AEA92-C3FE-4B08-8118-2A63909CBA9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1B1AEA92-C3FE-4B08-8118-2A63909CBA9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1B1AEA92-C3FE-4B08-8118-2A63909CBA9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1B1AEA92-C3FE-4B08-8118-2A63909CBA9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F770A9A-D2CA-40B3-BC5D-8696120B4606}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F770A9A-D2CA-40B3-BC5D-8696120B4606}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F770A9A-D2CA-40B3-BC5D-8696120B4606}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F770A9A-D2CA-40B3-BC5D-8696120B4606}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {6C8B7F43-B99F-4DD2-A6BB-3CE5321A8784}
+		SolutionGuid = {D4B36C06-A026-405E-83BE-49CBDC04F8B5}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,9 @@
+
+version: '3.4'
+
+services:
+  telegrambackups:
+    image: telegrambackups
+    build:
+      context: .
+      dockerfile: ./Dockerfile

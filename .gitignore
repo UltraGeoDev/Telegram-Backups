@@ -1,9 +1,3 @@
-# From .NET Core 3.0 you can use the command: `dotnet new gitignore` to generate a customizable .gitignore file
-App.config
-data/chats.json
-data/backup/*.json
-data/media/*
-
 *.swp
 *.*~
 project.lock.json
