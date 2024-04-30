@@ -1,0 +1,1 @@
+I'm not autistic enough to write tests yet.
