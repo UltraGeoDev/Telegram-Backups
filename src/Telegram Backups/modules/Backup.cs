@@ -4,15 +4,17 @@ using ParsingTools;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
 using TL.Methods;
+using YaDiskTools;
 
 namespace Backups {
 
-    class CreateBackup (WTelegram.Client client, ILogger logger, int limit = 100) 
+    class CreateBackup (WTelegram.Client client, ILogger logger, string? client_id, int limit = 100) 
     {
 
         public WTelegram.Client client = client;
         public int limit = limit;
         public ILogger logger = logger;
+        public YaDisk yaDisk = new(client_id, logger);
 
         public static Chats Get_chats() 
         {
@@ -75,6 +77,9 @@ namespace Backups {
             Directory.CreateDirectory("data/backup");
             Directory.CreateDirectory("data/media");
 
+            // Create backup folder in yandex disk
+            await yaDisk.CreateFolder();
+
             // Login
             await client.LoginUserIfNeeded();
 
@@ -91,7 +96,9 @@ namespace Backups {
 
                 // Write to json file
                 string path = $"data/backup/{chat.name}.json";
+
                 File.WriteAllText(path, parsed_string);
+                await yaDisk.UploadBackupJSON(path);
 
                 logger.LogInformation($"Created backup for {chat.name}. Total messages: {messages.Count}");
             }

@@ -17,3 +17,7 @@
 0.0.4
 
 - added takeout session
+
+0.0.5
+
+- upload json files to disk

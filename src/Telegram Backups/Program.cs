@@ -2,8 +2,6 @@
 using Backups;
 using WTelegram;
 using Microsoft.Extensions.Logging;
-using TL;
-using TL.Methods;
 
 class Program {
     private readonly string? AppId = ConfigurationManager.AppSettings.Get("api_id");
@@ -13,6 +11,8 @@ class Program {
     private readonly string? LastName = ConfigurationManager.AppSettings.Get("last_name");
     private readonly string? Password = ConfigurationManager.AppSettings.Get("password");
     private readonly int limit = int.Parse(ConfigurationManager.AppSettings.Get("limit")!);
+    private readonly string? token = ConfigurationManager.AppSettings.Get("token");
+
     
     public string? Configs(string what) 
     {
@@ -39,7 +39,7 @@ class Program {
         using var client = new Client(Configs);
 
         // Create backup instance
-        var backup = new CreateBackup(client, logger, limit);
+        var backup = new CreateBackup(client, logger, token, limit);
         
         // Create backup
         logger.LogInformation("Starting backup...");
