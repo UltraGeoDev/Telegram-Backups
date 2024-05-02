@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  TelegramBackup:
+    image: telegrambackup
+    build:
+      context: src/Telegram Backups/
+      dockerfile: Dockerfile
+    ports:
+      - 3000
+    

@@ -21,3 +21,8 @@
 0.0.5
 
 - upload json files to disk
+
+0.0.6
+
+- upload media to disk
+- docker

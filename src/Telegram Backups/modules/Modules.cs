@@ -1,6 +1,5 @@
 namespace TelegramData
 {
-
     class Chat
     {
         public required string name { get; set; }
@@ -12,5 +11,4 @@ namespace TelegramData
         public required List<Chat> chats { get; set; }
         public required int total { get; set; }
     }
-    
 }

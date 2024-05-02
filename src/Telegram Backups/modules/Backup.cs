@@ -1,35 +1,35 @@
-using TL;
-using TelegramData;
-using ParsingTools;
-using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using ParsingTools;
+using TelegramData;
+using TL;
 using TL.Methods;
 using YaDiskTools;
 
-namespace Backups {
-
-    class CreateBackup (WTelegram.Client client, ILogger logger, string? client_id, int limit = 100) 
+namespace Backups
+{
+    class CreateBackup(WTelegram.Client client, ILogger logger, string? client_id, int limit = 100)
     {
-
         public WTelegram.Client client = client;
         public int limit = limit;
         public ILogger logger = logger;
         public YaDisk yaDisk = new(client_id, logger);
 
-        public static Chats Get_chats() 
+        public static Chats Get_chats()
         {
-
             // Get chats
             string filename = "data/chats.json";
             string jsonString = File.ReadAllText(filename);
-            
+
             // Parse chats
             Chats chats = System.Text.Json.JsonSerializer.Deserialize<Chats>(jsonString)!;
-            
-            return chats; 
+
+            return chats;
         }
 
-        public async Task<List<Dictionary<string, string?>>> Get_messages(TelegramData.Chat required_chat) 
+        public async Task<List<Dictionary<string, string?>>> Get_messages(
+            TelegramData.Chat required_chat
+        )
         {
             User user = new();
             InputPeerUser peer = new(required_chat.id, user.access_hash);
@@ -46,39 +46,49 @@ namespace Backups {
 
             var finishTakeout = new Account_FinishTakeoutSession();
 
-
             // Get messages
             var messages = await client.InvokeWithTakeout(
-                takeout.id, 
-                new Messages_GetHistory() {peer=peer, limit=limit}
+                takeout.id,
+                new Messages_GetHistory() { peer = peer, limit = limit }
             );
 
             // Pasing tools
             var parsing = new ParseMessage(messages, client);
 
             // Parse messages
-            try {
-                foreach (var msgBase in messages.Messages) {
+            try
+            {
+                foreach (var msgBase in messages.Messages)
+                {
                     var parsed_msg = await parsing.Parse(msgBase); // Parse message
                     result.Insert(0, parsed_msg); // Insert at the beginning
+
+                    // Upload media to yandex disk
+                    if (parsed_msg.TryGetValue("media", out string? value))
+                    {
+                        string? media_path = value;
+                        await yaDisk.UploadBackupFile(media_path, "/backups/media/");
+                    }
                 }
                 finishTakeout.flags = Account_FinishTakeoutSession.Flags.success;
             }
-            finally {
+            finally
+            {
                 await client.InvokeWithTakeout(takeout.id, finishTakeout); // Finish takeout
             }
 
             return result;
         }
-        
-        public async Task Create() 
+
+        public async Task Create()
         {
             // Create folders
             Directory.CreateDirectory("data/backup");
             Directory.CreateDirectory("data/media");
 
             // Create backup folder in yandex disk
-            await yaDisk.CreateFolder();
+            await yaDisk.CreateFolder("/backups");
+            await yaDisk.CreateFolder("/backups/media");
 
             // Login
             await client.LoginUserIfNeeded();
@@ -86,8 +96,10 @@ namespace Backups {
             // Get chats to backup
             Chats chats = Get_chats();
 
-            foreach (var chat in chats.chats) 
+            foreach (var chat in chats.chats)
             {
+                logger.LogInformation($"Starting backup for {chat.name}");
+
                 // Get messages
                 var messages = await Get_messages(chat);
 
@@ -98,9 +110,11 @@ namespace Backups {
                 string path = $"data/backup/{chat.name}.json";
 
                 File.WriteAllText(path, parsed_string);
-                await yaDisk.UploadBackupJSON(path);
+                await yaDisk.UploadBackupFile(path, "/backups/");
 
-                logger.LogInformation($"Created backup for {chat.name}. Total messages: {messages.Count}");
+                logger.LogInformation(
+                    $"Created backup for {chat.name}. Total messages: {messages.Count}"
+                );
             }
         }
     }
