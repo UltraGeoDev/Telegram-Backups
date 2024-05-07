@@ -38,7 +38,7 @@ class Program
         }
     }
 
-    public async Task RunBackup(string[] args)
+    public async Task RunBackup(string[] _)
     {
         // Create logger
         using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
@@ -51,9 +51,17 @@ class Program
         var backup = new CreateBackup(client, logger, token, limit);
 
         // Create backup
-        logger.LogInformation("Starting backup...");
-        await backup.Create();
-        logger.LogInformation("Backup finished");
+        try
+        {
+            logger.LogInformation("Starting backup...");
+            await backup.Create();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Backup failed");
+            return;
+        }
+        logger.LogInformation("Backup finished successfully");
     }
 
     static async Task Main(string[] args)

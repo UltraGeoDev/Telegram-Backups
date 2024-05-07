@@ -34,7 +34,8 @@ namespace ParsingTools
                 { "from", from_user.ToString() },
                 { "date", msg.Date.ToString() },
                 { "text", msg.message == "" ? null : msg.message },
-                { "media", media_path }
+                { "media", media_path },
+                { "type", GetMediaType(msg) }
             };
 
             return parsed;
@@ -59,25 +60,29 @@ namespace ParsingTools
         public async Task<string?> ParseMedia(Message msg)
         {
             // Base path to store files
-            string base_path = "data/media/" + Guid.NewGuid().ToString() + ".";
+            string base_path = "data/media/";
 
             if (msg.media is MessageMediaDocument { document: Document document })
             {
                 // Create file stream and filepath
                 string ext = document.mime_type[(document.mime_type.IndexOf('/') + 1)..];
-                using var fileStream = File.Create(base_path + ext);
+                string file_id = document.id.ToString();
+
+                using var fileStream = File.Create(base_path + $"{file_id}.{ext}");
 
                 // Download document
                 await client.DownloadFileAsync(document, fileStream);
 
                 fileStream.Close();
-                return base_path + ext;
+                return base_path + $"{file_id}.{ext}";
             }
             else if (msg.media is MessageMediaPhoto { photo: Photo photo })
             {
                 // Create file stream and filepath
                 string ext = "jpg";
-                using var fileStream = File.Create(base_path + ext);
+                string file_id = photo.id.ToString();
+
+                using var fileStream = File.Create(base_path + $"{file_id}.{ext}");
 
                 // Download photo
                 var type = await client.DownloadFileAsync(photo, fileStream);
@@ -86,12 +91,34 @@ namespace ParsingTools
 
                 // Rename file if needed
                 if (type is not Storage_FileType.unknown and not Storage_FileType.partial)
-                    File.Move(base_path + ext, base_path + type, true);
-
-                return base_path + type;
+                {
+                    File.Move(
+                        base_path + $"{file_id}.{ext}",
+                        base_path + $"{file_id}.{type}",
+                        true
+                    );
+                    return base_path + $"{file_id}.{type}";
+                }
+                return base_path + $"{file_id}.{ext}";
             }
 
             return null;
+        }
+
+        // Get media type
+        public static string GetMediaType(Message msg)
+        {
+            string type;
+            try
+            {
+                type = msg.media.GetType().Name; // Get media type
+                type ??= "Text";
+            }
+            catch (NullReferenceException)
+            {
+                type = "Text"; // Get text type if media is null
+            }
+            return type;
         }
     }
 }

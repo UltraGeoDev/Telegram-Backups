@@ -13,7 +13,7 @@ namespace Backups
         public WTelegram.Client client = client;
         public int limit = limit;
         public ILogger logger = logger;
-        public YaDisk yaDisk = new(client_id, logger);
+        public YaDisk yaDisk = new(client_id);
 
         public static Chats Get_chats()
         {
@@ -37,12 +37,33 @@ namespace Backups
             // Parsed messages
             List<Dictionary<string, string?>> result = [];
 
-            // Takeout session
-            var takeout = await client.Account_InitTakeoutSession(
-                message_chats: true,
-                message_channels: true,
-                message_users: true
-            );
+            // Init takeout
+            Account_Takeout takeout;
+
+            try
+            {
+                // Takeout session
+                takeout = await client.Account_InitTakeoutSession(
+                    message_chats: true,
+                    message_channels: true,
+                    message_users: true
+                );
+            }
+            catch (RpcException)
+            {
+                // wait for access
+                Console.WriteLine(
+                    "---WARNING---\nplease allow access to messages in the telegram\nbackup will start in the next 30 seconds\n-------------"
+                );
+                Thread.Sleep(30000);
+
+                // Takeout session
+                takeout = await client.Account_InitTakeoutSession(
+                    message_chats: true,
+                    message_channels: true,
+                    message_users: true
+                );
+            }
 
             var finishTakeout = new Account_FinishTakeoutSession();
 
@@ -67,7 +88,21 @@ namespace Backups
                     if (parsed_msg.TryGetValue("media", out string? value))
                     {
                         string? media_path = value;
-                        await yaDisk.UploadBackupFile(media_path, "/backups/media/");
+
+                        try
+                        {
+                            string? uploaded_path = await yaDisk.UploadBackupFile(
+                                media_path,
+                                "/backups/media/"
+                            );
+
+                            if (uploaded_path != null)
+                                logger.LogInformation($"Uploaded {uploaded_path}");
+                        }
+                        catch (Exception e)
+                        {
+                            logger.LogError(e, $"Failed to upload {media_path} due to {e.Message}");
+                        }
                     }
                 }
                 finishTakeout.flags = Account_FinishTakeoutSession.Flags.success;
@@ -110,7 +145,16 @@ namespace Backups
                 string path = $"data/backup/{chat.name}.json";
 
                 File.WriteAllText(path, parsed_string);
-                await yaDisk.UploadBackupFile(path, "/backups/");
+
+                try
+                {
+                    await yaDisk.UploadBackupFile(path, "/backups/");
+                }
+                catch (Exception)
+                {
+                    logger.LogError($"Failed to upload json backup for {chat.name}");
+                    continue;
+                }
 
                 logger.LogInformation(
                     $"Created backup for {chat.name}. Total messages: {messages.Count}"

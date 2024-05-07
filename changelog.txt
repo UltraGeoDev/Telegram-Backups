@@ -26,3 +26,8 @@
 
 - upload media to disk
 - docker
+
+0.0.7
+
+- update docker
+- add startup instructions

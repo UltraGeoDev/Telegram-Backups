@@ -1,16 +1,15 @@
 using System.Net.Http.Headers;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace YaDiskTools
 {
-    class YaDisk(string? token, ILogger logger)
+    class YaDisk(string? token)
     {
-        public readonly HttpClient client = new();
+        // Yandex disk client
+        public readonly HttpClient client = new() { Timeout = TimeSpan.FromMinutes(10) };
         public readonly string token = token!;
-        public readonly ILogger logger = logger;
 
-        public async Task CreateFolder(string folder_path)
+        public async Task<string> CreateFolder(string folder_path)
         {
             const string base_url = "https://cloud-api.yandex.net/v1/disk/resources?";
             string base_path = folder_path.Replace("/", "%2F");
@@ -27,18 +26,17 @@ namespace YaDiskTools
 
             if (status_code != 409 && status_code != 201)
             {
-                logger.LogError("Failed to create folder in yandex disk");
                 throw new Exception();
             }
 
-            logger.LogInformation($"Created {base_path} folder in yandex disk");
+            return base_path;
         }
 
-        public async Task UploadBackupFile(string? file_path, string dir_path)
+        public async Task<string?> UploadBackupFile(string? file_path, string dir_path)
         {
             // Check if file exists
             if (file_path is null)
-                return;
+                return null;
 
             // Create upload url
             const string base_url = "https://cloud-api.yandex.net/v1/disk/resources/upload?";
@@ -76,7 +74,7 @@ namespace YaDiskTools
 
             upload_file_response.EnsureSuccessStatusCode();
 
-            logger.LogInformation($"Uploaded {file_name} to yandex disk");
+            return file_name;
         }
     }
 }
