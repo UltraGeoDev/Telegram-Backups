@@ -1,9 +1,10 @@
-# It's empty for now...
+# Telegram Backups
 
-## Version 0.0.7
+## Version 0.1.0
 
 > [!WARNING]
-> not ready for use
+> the project is at the testing stage
+> if you find an error, write to [issues](https://github.com/UltraGeoDev/Telegram-Backups/issues)
 
 Planned to add:
 1. Pulling all types of messages

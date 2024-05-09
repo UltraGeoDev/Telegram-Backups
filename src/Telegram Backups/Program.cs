@@ -55,13 +55,13 @@ class Program
         {
             logger.LogInformation("Starting backup...");
             await backup.Create();
+            logger.LogInformation("Backup finished successfully");
         }
         catch (Exception e)
         {
             logger.LogError(e, "Backup failed");
             return;
         }
-        logger.LogInformation("Backup finished successfully");
     }
 
     static async Task Main(string[] args)
